@@ -10,7 +10,11 @@ private val logger = KotlinLogging.logger {}
 private val mapper = jacksonObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
 
 suspend fun main() {
-    val blogs = scrapeDirectory()
+    val blogs = try {
+        scrapeDirectory()
+    } finally {
+        DriverManager.release()
+    }
     val file = File("Pasadena Village Blogs - ${Instant.now().epochSecond}.json")
     mapper.writeValue(file, blogs)
     logger.info { "Output written to ${file.absolutePath}" }
